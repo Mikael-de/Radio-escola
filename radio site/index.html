@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Rádio HF - A voz da galera! | EEB Henrique Fontes</title>
+    <link rel="icon" href="2g.jpg" type="image/png" />
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* === VARIÁVEIS E RESET === */
+        :root {
+            --cor-primaria: #4A00E0;
+            --cor-secundaria: #8E2DE2;
+            --cor-destaque: #FF6B6B;
+            --cor-texto: #333;
+            --cor-fundo: #f9f9f9;
+            --cor-card: #ffffff;
+            --cor-borda: #e0e0e0;
+            --sombra: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --sombra-escura: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modo-escuro {
+            --cor-texto: #f0f0f0;
+            --cor-fundo: #121212;
+            --cor-card: #1e1e1e;
+            --cor-borda: #333;
+            --sombra: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            line-height: 1.6;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        
+        /* === CABEÇALHO MODERNO === */
+        header {
+            background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+            box-shadow: var(--sombra);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+            transform: rotate(30deg);
+        }
+        
+        .logo {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* === NAVEGAÇÃO === */
+        nav {
+            background-color: var(--cor-card);
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--cor-borda);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .nav-icon {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .nav-icon span {
+            width: 30px;
+            height: 3px;
+            background: var(--cor-primaria);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+        }
+        
+        nav li {
+            margin: 0 15px;
+        }
+        
+        nav a {
+            color: var(--cor-primaria);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 8px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        nav a::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--cor-destaque);
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+        
+        nav a:hover::after {
+            width: 100%;
+        }
+        
+        nav a:hover {
+            color: var(--cor-destaque);
+        }
+        
+        /* === CONTROLES DE MODO === */
+        .modo-toggle {
+            position: fixed;
+            bottom: 100px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: var(--cor-card);
+            color: var(--cor-texto);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--sombra);
+            cursor: pointer;
+            z-index: 99;
+            transition: all 0.3s ease;
+        }
+        
+        .modo-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        /* === CONTEÚDO PRINCIPAL === */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        section {
+            margin-bottom: 60px;
+            padding: 30px;
+            background: var(--cor-card);
+            border-radius: 16px;
+            box-shadow: var(--sombra);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--cor-borda);
+        }
+        
+        section:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-escura);
+        }
+        
+        h2 {
+            color: var(--cor-primaria);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--cor-destaque);
+            font-size: 1.8rem;
+        }
+        
+        /* === SEÇÃO DE INTRODUÇÃO === */
+        .introducao {
+            text-align: center;
+            position: relative;
+        }
+        
+        .destaque {
+            color: var(--cor-destaque);
+            font-weight: 700;
+        }
+        
+        .chamada {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: var(--cor-secundaria);
+            font-weight: 600;
+        }
+        
+        .imagem-borda {
+            display: block;
+            margin: 25px auto;
+            max-width: 90%;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+        
+        .imagem-borda:hover {
+            transform: scale(1.02);
+        }
+        
+        /* === SEÇÃO DE PROGRAMAÇÃO === */
+        .programas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .programa-card {
+            background: linear-gradient(135deg, var(--cor-card) 0%, var(--cor-card) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--cor-primaria);
+            border: 1px solid var(--cor-borda);
+        }
+        
+        .programa-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid var(--cor-destaque);
+        }
+        
+        .programa-card h3 {
+            color: var(--cor-primaria);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        
+        .programa-card p {
+            color: var(--cor-texto);
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+        
+        .programa-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--cor-primaria);
+        }
+        
+        /* === SEÇÃO DE PARTICIPAÇÃO === */
+        .participacao {
+            text-align: center;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--cor-destaque), #FF8E8E);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
+        }
+        
+        .formulario {
+            margin-top: 30px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* === BOLHA FLUTUANTE DO WHATSAPP === */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 25px;
+            right: 25px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+        
+        .whatsapp-float:hover {
+            background-color: #128C7E;
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(37, 211, 102, 0.7);
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 25px rgba(37, 211, 102, 0.7);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+            }
+        }
+        
+        /* === SEÇÃO DE REDES SOCIAIS === */
+        .redes-sociais-section {
+            text-align: center;
+            padding: 40px 30px;
+        }
+        
+        .redes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .rede-card {
+            background: var(--cor-card);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--sombra);
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 1px solid var(--cor-borda);
+        }
+        
+        .rede-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--sombra-escura);
+        }
+        
+        .rede-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .instagram-icon {
+            color: #E1306C;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .facebook-icon {
+            color: #1877F2;
+        }
+        
+        .tiktok-icon {
+            color: #000000;
+        }
+        
+        .rede-card h3 {
+            color: var(--cor-primaria);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .rede-card p {
+            color: var(--cor-texto);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+        
+        .rede-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .rede-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(74, 0, 224, 0.3);
+        }
+        
+        /* === RODAPÉ === */
+        footer {
+            text-align: center;
+            background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+            color: white;
+            padding: 25px;
+            margin-top: 60px;
+        }
+        
+        .redes-sociais-footer {
+            margin: 15px 0;
+        }
+        
+        .redes-sociais-footer a {
+            color: white;
+            margin: 0 15px;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .redes-sociais-footer a:hover {
+            color: var(--cor-destaque);
+            transform: translateY(-5px);
+        }
+        
+        /* === RESPONSIVIDADE === */
+        @media (max-width: 1024px) {
+            /* Tablet */
+            .programas-grid, .redes-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .logo h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            /* Mobile */
+            nav ul {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--cor-card);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                z-index: 99;
+                border-top: 1px solid var(--cor-borda);
+            }
+            
+            nav ul.active {
+                display: flex;
+            }
+            
+            .nav-icon {
+                display: flex;
+            }
+            
+            nav li {
+                margin: 10px 0;
+            }
+            
+            .programas-grid, .redes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            section {
+                padding: 20px;
+            }
+            
+            .whatsapp-float, .modo-toggle {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                font-size: 25px;
+            }
+            
+            .modo-toggle {
+                bottom: 90px;
+                right: 20px;
+            }
+            
+            .redes-sociais-footer a {
+                margin: 0 10px;
+                font-size: 1.7rem;
+            }
+            
+            .rede-icon {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Mobile pequeno */
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+            
+            .logo p {
+                font-size: 0.9rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .chamada {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Bolha flutuante do WhatsApp -->
+    <a href="https://wa.me/5566984443942?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20Rádio%20HF!" class="whatsapp-float" target="_blank" aria-label="Entre em contato pelo WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Controle de modo escuro/claro -->
+    <div class="modo-toggle" id="modoToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <header>
+        <div class="logo">
+            <h1><i class="fas fa-radio"></i> Rádio HF - A voz da galera!</h1>
+            <p>EEB Henrique Fontes Cívico-Militar | A rádio feita por alunos, para alunos!</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="nav-container">
+            <button class="nav-icon" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul id="navMenu">
+                <li><a href="#introducao">Início</a></li>
+                <li><a href="#programas">Programação</a></li>
+                <li><a href="#participacao">Participe</a></li>
+                <li><a href="#redes-sociais">Redes Sociais</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section id="introducao" class="introducao">
+            <h2>Ei, galera! Bem-vindos à Rádio HF! <i class="fas fa-headphones"></i></h2>
+            <p class="chamada">A rádio que toca o som da sua escola e dá voz à sua opinião!</p>
+            <p>
+                A <span class="destaque">Rádio HF</span> é o point oficial de comunicação da EEB Henrique Fontes! 
+                Feita <strong>por alunos e para alunos</strong>, nosso canal é o lugar onde a galera se encontra, 
+                descobre as novidades, curte as melhores tracks e fica por dentro de tudo que rola na escola.
+            </p>
+            <p>
+                Aqui, a gente não só informa, mas também <strong>entretém, inspira e conecta</strong> toda a comunidade escolar. 
+                Seja durante o intervalo, na hora do almoço ou em eventos especiais, a Rádio HF está sempre presente, 
+                levando informação, música e diversão para todos os cantos da escola.
+            </p>
+            <p>
+                Nossa missão? Dar voz aos estudantes, compartilhar talentos, destacar conquistas e fazer 
+                da nossa escola um lugar ainda mais legal и unido!
+            </p>
+            <img src="01-G.jpg" alt="Entrada da escola - o lugar onde a mágica acontece!" class="imagem-borda" />
+        </section>
+
+        <section id="programas" class="programas">
+            <h2>Nossa Programação <i class="fas fa-music"></i></h2>
+            <p>
+                A Rádio HF traz uma programação diversificada, com conteúdos que vão desde as notícias 
+                importantes até as tracks mais ouvidas pelo pessoal. Confira alguns dos nossos quadros:
+            </p>
+            
+            <div class="programas-grid">
+                <div class="programa-card">
+                    <div class="programa-icon"><i class="fas fa-newspaper"></i></div>
+                    <h3>HF Notícias</h3>
+                    <p>Tudo que você precisa saber sobre os eventos, avisos e novidades da escola. Não perca os recados importantes e fique por dentro do que vai rolar!</p>
+                </div>
+                
+                <div class="programa-card">
+                    <div class="programa-icon"><i class="fas fa-music"></i></div>
+                    <h3>HF Hits</h3>
+                    <p>O momento musical da galera! As músicas mais tocadas, pedidos especiais e as novidades do mundo da música. Manda seu pedido que a gente toca!</p>
+                </div>
+                
+                <div class="programa-card">
+                    <div class="programa-icon"><i class="fas fa-microphone"></i></div>
+                    <h3>HF Entrevistas</h3>
+                    <p>Conversas descontraídas com professores, alunos destaque e personalidades incríveis. Descubra histórias inspiradoras da nossa comunidade!</p>
+                </div>
+                
+                <div class="programa-card">
+                    <div class="programa-icon"><i class="fas fa-running"></i></div>
+                    <h3>HF Esporte</h3>
+                    <p>Tudo sobre os campeonatos, jogos e atividades esportivas da escola. A cobertura dos eventos e as dicas para manter o pique!</p>
+                </div>
+                
+                <div class="programa-card">
+                    <div class="programa-icon"><i class="fas fa-laugh"></i></div>
+                    <h3>HF Humor</h3>
+                    <p>Piadas, curiosidades, memes e tudo para dar aquela descontraída no dia. Porque rir é o melhor remédio, né?</p>
+                </div>
+                
+                <div class="programa-card">
+                    <div class="programa-icon"><i class="fas fa-star"></i></div>
+                    <h3>HF Talentos</h3>
+                    <p>Espaço para mostrar os talentos da galera! Música, poesia, arte - se você faz algo incrível, aqui é seu palco!</p>
+                </div>
+            </div>
+            
+            
+        </section>
+
+        <section id="participacao" class="participacao">
+            <h2>Faça Parte Dessa Galera! <i class="fas fa-microphone-alt"></i></h2>
+            <p>
+                Quer ser mais que ouvinte? <span class="destaque">Você pode ser estrela da Rádio HF!</span> 
+                Estamos sempre procurando talentos para compor nossa equipe.
+            </p>
+            <p>
+                Não importa se você quer ser <strong>locutor</strong>, <strong>operador de som</strong>, 
+                <strong>repórter</strong>, <strong>produtor</strong> ou até mesmo <strong>criador de conteúdo</strong> - 
+                temos um lugar para você!
+            </p>
+            <p>
+                Participar da rádio é uma oportunidade incrível para <strong>desenvolver habilidades de comunicação</strong>, 
+                <strong>trabalho em equipe</strong> e <strong>criatividade</strong>, além de ser super divertido e 
+                render aquela experiência legal para seu currículo!
+            </p>
+            
+            <a href="#formulario" class="cta-button">Quero Participar!</a>
+            
+            <div id="formulario" class="formulario">
+                <iframe width="100%" height="500px"
+                    src="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=EP4XCdtWv0SxxTEGGrIc-ZHzzjoeGmJPrB0XNx976Z1UNzBRTk5HVTlJVkFRRTZDSlQwUjFYVEtDSC4u&embed=true"
+                    frameborder="0" marginwidth="0" marginheight="0"
+                    style="border: none; max-width:100%; max-height:100vh"
+                    allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen>
+                </iframe>
+            </div>
+        </section>
+
+        <section id="redes-sociais" class="redes-sociais-section">
+            <h2>Siga o Grêmio Estudantil! <i class="fas fa-hashtag"></i></h2>
+            <p>
+                Acompanhe as redes sociais do nosso Grêmio Estudantil e fique por dentro de tudo que rola na escola! 
+                Eventos, ações, novidades e muito mais você encontra nas nossas redes:
+            </p>
+            
+            <div class="redes-grid">
+                <div class="rede-card">
+                    <i class="fab fa-instagram rede-icon instagram-icon"></i>
+                    <h3>Grêmio no Instagram</h3>
+                    <p>Acompanhe as ações, eventos e iniciativas do Grêmio Estudantil da nossa escola!</p>
+                    <a href="https://www.instagram.com/gremio.sea/" class="rede-button" target="_blank">Seguir no Instagram</a>
+                </div>
+                
+                <div class="rede-card">
+                    <i class="fab fa-tiktok rede-icon tiktok-icon"></i>
+                    <h3>Grêmio no TikTok</h3>
+                    <p>Curta nossos vídeos divertidos, trends e conteúdos exclusivos no TikTok!</p>
+                    <a href="https://www.tiktok.com/@gremio.sea?_t=zm-8rftnoecljq&_r=1" class="rede-button" target="_blank">Seguir no TikTok</a>
+                </div>
+                
+                <div class="rede-card">
+                    <i class="fab fa-facebook rede-icon facebook-icon"></i>
+                    <h3>Facebook</h3>
+                    <p>Fique por dentro dos eventos e notícias da nossa escola pelo Facebook!</p>
+                    <a href="https://www.facebook.com/hf.henriquefontes?locale=pt_BR" class="rede-button" target="_blank">Curta no Facebook</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Conecte-se com o Grêmio Estudantil!</p>
+        <div class="redes-sociais-footer">
+            <a href="https://www.instagram.com/gremio.sea/" aria-label="Instagram do Grêmio" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@gremio.sea?_t=zm-8rftnoecljq&_r=1" aria-label="TikTok do Grêmio" target="_blank"><i class="fab fa-tiktok"></i></a>
+            <a href="https://www.facebook.com/hf.henriquefontes?locale=pt_BR" aria-label="Facebook da Escola" target="_blank"><i class="fab fa-facebook"></i></a>
+        </div>
+        <p>&copy; 2025 Rádio HF - EEB Henrique Fontes Cívico-Militar | Desenvolvido por Mikael</p>
+    </footer>
+
+    <script>
+        // Função para alternar entre modo escuro e claro
+        const modoToggle = document.getElementById('modoToggle');
+        const iconModo = modoToggle.querySelector('i');
+        
+        // Verificar se há uma preferência salva
+        if (localStorage.getItem('modoEscuro') === 'true') {
+            document.body.classList.add('modo-escuro');
+            iconModo.classList.remove('fa-moon');
+            iconModo.classList.add('fa-sun');
+        }
+        
+        modoToggle.addEventListener('click', () => {
+            document.body.classList.toggle('modo-escuro');
+            
+            // Alternar ícone
+            if (document.body.classList.contains('modo-escuro')) {
+                iconModo.classList.remove('fa-moon');
+                iconModo.classList.add('fa-sun');
+                localStorage.setItem('modoEscuro', 'true');
+            } else {
+                iconModo.classList.remove('fa-sun');
+                iconModo.classList.add('fa-moon');
+                localStorage.setItem('modoEscuro', 'false');
+            }
+        });
+        
+        // Menu mobile toggle
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            
+            // Animação do ícone de hamburguer
+            const spans = navToggle.querySelectorAll('span');
+            if (navMenu.classList.contains('active')) {
+                spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+                spans[1].style.opacity = '0';
+                spans[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+            } else {
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            }
+        });
+        
+        // Fechar menu ao clicar em um link
+        const navLinks = document.querySelectorAll('nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                const spans = navToggle.querySelectorAll('span');
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            });
+        });
+    </script>
+</body>
+
+</html>
